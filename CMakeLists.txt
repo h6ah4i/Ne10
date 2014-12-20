@@ -1,5 +1,5 @@
 #
-#  Copyright 2011-14 ARM Limited
+#  Copyright 2011-14 ARM Limited and Contributors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -16,7 +16,7 @@
 #  THIS SOFTWARE IS PROVIDED BY ARM LIMITED AND CONTRIBUTORS "AS IS" AND
 #  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 #  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL ARM LIMITED BE LIABLE FOR ANY
+#  DISCLAIMED. IN NO EVENT SHALL ARM LIMITED AND CONTRIBUTORS BE LIABLE FOR ANY
 #  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 #  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 #  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -26,7 +26,7 @@
 #
 cmake_minimum_required(VERSION 2.6)
 
-project(NE10 C ASM)
+project(NE10 C CXX ASM)
 
 option(NE10_BUILD_SHARED "Build NE10 shared libraries" OFF)
 option(NE10_BUILD_STATIC "Build NE10 static libraries" ON)
@@ -83,9 +83,6 @@ if(ANDROID_PLATFORM)
     ${ANDROID_TOOLCHAIN_PATH}/arm-linux-androideabi-as
     ${ANDROID_TOOLCHAIN_PATH}/arm-linux-androideabi-ar
     ${ANDROID_TOOLCHAIN_PATH}/arm-linux-androideabi-ranlib")
-    if(ANDROID_PLATFORM AND ANDROID_DEMO)
-      add_subdirectory(android/NE10Demo/jni)
-    endif()
 elseif(GNULINUX_PLATFORM)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb-interwork -mthumb -march=armv7-a -mfpu=vfp3")
     set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -mthumb-interwork -mthumb -march=armv7-a -mfpu=neon")
@@ -102,10 +99,9 @@ elseif(IOS_PLATFORM)
 
     string(REPLACE ";" "" CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
     string(REPLACE ";" "" CMAKE_ASM_FLAGS ${CMAKE_ASM_FLAGS})
-    if(IOS_DEMO)
-        add_subdirectory(ios)
-    endif()
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_ASM_FLAGS}")
 
 # The NE10 library.
 add_subdirectory(modules)
@@ -116,4 +112,12 @@ endif()
 
 if(NE10_BUILD_UNIT_TEST)
     add_subdirectory(test)
+endif()
+
+if(ANDROID_PLATFORM AND ANDROID_DEMO)
+    add_subdirectory(android/NE10Demo/jni)
+endif()
+
+if(IOS_PLATFORM AND IOS_DEMO)
+    add_subdirectory(ios)
 endif()
